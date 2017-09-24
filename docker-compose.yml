@@ -1,0 +1,43 @@
+version: '3.1'
+
+services:
+  database:
+    image: mariadb:10.3
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: strongsecret
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: anotherstrongsecret
+
+  wordpress:
+     depends_on:
+       - database
+     image: wordpress:4.8
+     expose:
+       - "9000"
+     restart: always
+     volumes:
+      - "/usr/src/wordpress"
+     environment:
+       WORDPRESS_DB_HOST: database
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: anotherstrongsecret
+
+  caddy:
+    restart: always
+    build: ./caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy_data:/root/.caddy
+      - ./Caddyfile:/etc/Caddyfile
+      - ./logs:/var/log/caddy
+    depends_on:
+      - wordpress
+
+volumes:
+  db_data:

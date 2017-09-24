@@ -1,0 +1,13 @@
+:80
+    
+root /var/www/html
+
+proxy / wordpress {
+    transparent
+}
+
+
+gzip
+
+log /var/log/caddy/access.log
+errors /var/log/caddy/error.log
